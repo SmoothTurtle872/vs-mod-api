@@ -1,7 +1,8 @@
 pub mod v1 {
-    use http::{Uri, uri::InvalidUri};
+    use reqwest::Url;
+    use url::ParseError;
 
-    pub static BASE_URL: &str = "http://mods.vintagestory.at/api";
+    pub static BASE_URL: &str = "https://mods.vintagestory.at/api";
     #[derive(Debug)]
     pub enum Endpoint {
         Tags,
@@ -48,17 +49,16 @@ pub mod v1 {
         }
 
         /// Get the URI of the requested endpoint
-        pub fn get_uri(&self) -> Result<Uri, InvalidUri> {
-            let url = format!("{BASE_URL}/{}", self.get_url_end());
-            url.parse::<Uri>()
+        pub fn get_url(&self) -> Result<Url, ParseError> {
+            Url::parse(&format!("{BASE_URL}/{}", self.get_url_end()))
         }
     }
 
     #[cfg(test)]
     mod tests {
-        use http::Uri;
+        use url::Url;
 
-        use crate::api::v1::Endpoint;
+        use super::Endpoint;
 
         #[test]
         fn endpoints() {
@@ -72,67 +72,37 @@ pub mod v1 {
             );
 
             let (tags, game_versions, authors, comments, mods, r#mod) = (
-                tags.get_uri().unwrap(),
-                game_versions.get_uri().unwrap(),
-                authors.get_uri().unwrap(),
-                comments.get_uri().unwrap(),
-                mods.get_uri().unwrap(),
-                r#mod.get_uri().unwrap(),
+                tags.get_url().unwrap(),
+                game_versions.get_url().unwrap(),
+                authors.get_url().unwrap(),
+                comments.get_url().unwrap(),
+                mods.get_url().unwrap(),
+                r#mod.get_url().unwrap(),
             );
 
             assert_eq!(
                 tags,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/tags")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/tags").unwrap()
             );
             assert_eq!(
                 game_versions,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/gameversions")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/gameversions").unwrap()
             );
             assert_eq!(
                 authors,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/authors")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/authors").unwrap()
             );
             assert_eq!(
                 comments,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/comments")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/comments").unwrap()
             );
             assert_eq!(
                 mods,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/mods")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/mods").unwrap()
             );
             assert_eq!(
                 r#mod,
-                Uri::builder()
-                    .scheme("http")
-                    .authority("mods.vintagestory.at")
-                    .path_and_query("/api/mod/6")
-                    .build()
-                    .unwrap()
+                Url::parse("http://mods.vintagestory.at/api/mod/6").unwrap()
             );
         }
     }

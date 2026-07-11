@@ -1,4 +1,4 @@
-use http::Uri;
+use reqwest::Url;
 use time::UtcDateTime;
 
 pub struct Mod {
@@ -7,15 +7,15 @@ pub struct Mod {
     pub name: String,
     pub text: String,
     pub author: String,
-    pub url_alias: Option<Uri>,
+    pub url_alias: Option<Url>,
     pub logo_file_name: Option<String>,
     pub logo_file: Option<String>,
     pub logo_file_db: Option<String>,
-    pub homepage_url: Option<Uri>,
-    pub sourcecode_url: Option<Uri>,
-    pub trailer_video_url: Option<Uri>,
-    pub issue_tracker_url: Option<Uri>,
-    pub wiki_url: Option<Uri>,
+    pub homepage_url: Option<Url>,
+    pub sourcecode_url: Option<Url>,
+    pub trailer_video_url: Option<Url>,
+    pub issue_tracker_url: Option<Url>,
+    pub wiki_url: Option<Url>,
     pub downloads: u32,
     pub follows: u32,
     pub trendingpoints: u32,
@@ -32,7 +32,7 @@ pub struct Mod {
 
 pub struct Release {
     pub releaseid: u32,
-    pub main_file: Uri,
+    pub main_file: Url,
     pub file_name: String,
     pub fileid: u32,
     pub downloads: u32,
@@ -44,7 +44,7 @@ pub struct Release {
 }
 pub struct Screenshot {
     pub filid: u32,
-    pub main_file: Uri,
+    pub main_file: Url,
     pub file_name: String,
     pub thumbnail_filname: String,
     pub created: UtcDateTime,
