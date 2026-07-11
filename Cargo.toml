@@ -1,0 +1,9 @@
+[package]
+name = "vs-mod-api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+http = "1.4.2"
+time = "0.3.53"
+tokio = "1.52.3"
