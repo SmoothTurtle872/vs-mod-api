@@ -1,16 +1,26 @@
-use reqwest::{Client, get};
-use vs_mod_api::api::v1::Endpoint;
+use reqwest::Client;
+use rusty_vs_mod_api::api::v1::{Endpoint, ModSearchSettings};
 
-// Examples
 #[tokio::main]
 async fn main() {
-    let url = Endpoint::Authors.get_url().unwrap();
-    println!("{:?}", url);
     let client = Client::builder()
-        .user_agent("VsModAPIRustCrate/1.0")
+        .user_agent(format!(
+            "VintageStoryRustModApiExamples/{}",
+            env!("CARGO_PKG_VERSION")
+        ))
         .build()
         .unwrap();
-    let request = client.get(url).send().await.unwrap();
 
-    println!("{:?}", request)
+    let data = Endpoint::Mods(Some(ModSearchSettings {
+        text: Some("More Classes".to_string()),
+        tag_ids: None,
+        game_versions: None,
+        author: None,
+        order_by: None,
+        order_direction: None,
+    }))
+    .get_data(&client)
+    .await
+    .unwrap();
+    println!("{data:?}");
 }
