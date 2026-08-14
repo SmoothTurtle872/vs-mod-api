@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde_json::Value;
 
-use data::{Author, Comment, GameVersion, Mod, ModsListMod, Tag};
+use types::{Author, Comment, GameVersion, Mod, ModsListMod, Tag};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Payload {
@@ -27,7 +27,7 @@ impl Payload {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Data {
     Authors(Vec<Author>),
     Tags(Vec<Tag>),
@@ -37,17 +37,17 @@ pub enum Data {
     Mod(Mod),
 }
 
-pub mod data {
+pub mod types {
     use serde::Deserialize;
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Author {
         #[serde(alias = "userid")]
         pub user_id: u64,
         pub name: String,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Tag {
         #[serde(alias = "tagid")]
         pub tag_id: String,
@@ -55,7 +55,7 @@ pub mod data {
         pub color: String,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct GameVersion {
         #[serde(alias = "tagid")]
         pub tag_id: i64,
@@ -63,7 +63,7 @@ pub mod data {
         pub color: String,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Comment {
         #[serde(alias = "commentid")]
         pub comment_id: u64,
@@ -77,7 +77,7 @@ pub mod data {
         pub last_modified: String,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct ModsListMod {
         #[serde(alias = "modid")]
         pub mod_id: u64,
@@ -95,14 +95,14 @@ pub mod data {
         pub author: String,
         #[serde(alias = "urlalias")]
         pub url_alias: Option<String>,
-        pub side: String,
+        pub side: Side,
         pub logo: Option<String>,
         pub tags: Vec<String>,
         #[serde(alias = "lastreleased")]
         pub last_released: String,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Mod {
         #[serde(alias = "modid")]
         pub mod_id: u64,
@@ -132,7 +132,7 @@ pub mod data {
         #[serde(alias = "trendingpoints")]
         pub trending_points: i64,
         pub comments: u64,
-        pub side: String,
+        pub side: Side,
         #[serde(alias = "type")]
         pub r#type: String,
         pub created: String,
@@ -145,7 +145,7 @@ pub mod data {
         pub screenshots: Vec<Screenshot>,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Release {
         #[serde(alias = "releaseid")]
         pub release_id: u64,
@@ -165,7 +165,7 @@ pub mod data {
         pub changelog: Option<String>,
     }
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct Screenshot {
         #[serde(alias = "fileid")]
         pub file_id: u64,
@@ -176,5 +176,15 @@ pub mod data {
         #[serde(alias = "thumbnailfilename")]
         pub thumbnail_file_name: String,
         pub created: String,
+    }
+
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+    pub enum Side {
+        #[serde(alias = "client")]
+        Client,
+        #[serde(alias = "server")]
+        Server,
+        #[serde(alias = "both")]
+        Both,
     }
 }

@@ -11,16 +11,6 @@ async fn main() {
         .build()
         .unwrap();
 
-    let data = Endpoint::Mods(Some(ModSearchSettings {
-        text: Some("More Classes".to_string()),
-        tag_ids: None,
-        game_versions: None,
-        author: None,
-        order_by: None,
-        order_direction: None,
-    }))
-    .get_data(&client)
-    .await
-    .unwrap();
+    let data = Endpoint::Mods(None).get_data(&client).await.unwrap();
     println!("{data:?}");
 }

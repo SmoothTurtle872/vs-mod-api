@@ -1,5 +1,6 @@
-pub mod processed;
-mod raw;
+pub mod data;
+
+use std::fmt;
 
 use reqwest;
 
@@ -64,7 +65,7 @@ impl std::fmt::Display for OrderDirection {
 }
 
 impl Endpoint {
-    pub async fn get_data(&self, client: &reqwest::Client) -> Result<raw::Data, Error> {
+    pub async fn get_data(&self, client: &reqwest::Client) -> Result<data::Data, Error> {
         let url = format!(
             "{URL_BASE}{}",
             match self {
@@ -123,37 +124,48 @@ impl Endpoint {
             }
         );
 
-        let payload: raw::Payload =
+        let payload: data::Payload =
             serde_json::from_str(&client.get(url).send().await?.text().await?)?;
 
         let data = payload.get_data()?;
 
-        match self {
+        Ok(match self {
             Self::Authors => {
-                let data: Vec<raw::data::Author> = serde_json::from_str(&data)?;
-                return Ok(raw::Data::Authors(data));
+                let data: Result<Vec<data::types::Author>, serde_json::Error> =
+                    serde_json::from_str(&data);
+                let data = data?;
+                data::Data::Authors(data)
             }
             Self::Tags => {
-                let data: Vec<raw::data::Tag> = serde_json::from_str(&data)?;
-                return Ok(raw::Data::Tags(data));
+                let data: Result<Vec<data::types::Tag>, serde_json::Error> =
+                    serde_json::from_str(&data);
+                let data = data?;
+                data::Data::Tags(data)
             }
             Self::GameVersions => {
-                let data: Vec<raw::data::GameVersion> = serde_json::from_str(&data)?;
-                return Ok(raw::Data::GameVersions(data));
+                let data: Result<Vec<data::types::GameVersion>, serde_json::Error> =
+                    serde_json::from_str(&data);
+                let data = data?;
+                data::Data::GameVersions(data)
             }
             Self::Comments(_) => {
-                let data: Vec<raw::data::Comment> = serde_json::from_str(&data)?;
-                return Ok(raw::Data::Comments(data));
+                let data: Result<Vec<data::types::Comment>, serde_json::Error> =
+                    serde_json::from_str(&data);
+                let data = data?;
+                data::Data::Comments(data)
             }
             Self::Mods(_) => {
-                let data: Vec<raw::data::ModsListMod> = serde_json::from_str(&data)?;
-                return Ok(raw::Data::Mods(data));
+                let data: Result<Vec<data::types::ModsListMod>, serde_json::Error> =
+                    serde_json::from_str(&data);
+                let data = data?;
+                data::Data::Mods(data)
             }
             Self::Mod(_) => {
-                let data: raw::data::Mod = serde_json::from_str(&data)?;
-                return Ok(raw::Data::Mod(data));
+                let data: Result<data::types::Mod, serde_json::Error> = serde_json::from_str(&data);
+                let data = data?;
+                data::Data::Mod(data)
             }
-        }
+        })
     }
 }
 
@@ -177,3 +189,15 @@ impl From<serde_json::Error> for Error {
         Self::JsonError(value)
     }
 }
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::RequestError(err) => write!(f, "Error Processing Request: {err}"),
+            Self::JsonError(err) => write!(f, "Error Parsing Json: {err}"),
+            Self::PayloadError(err) => write!(f, "Error in Payload, status code {err}"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
