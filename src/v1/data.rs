@@ -3,8 +3,8 @@ use serde_json::Value;
 
 use types::{Author, Comment, GameVersion, Mod, ModsListMod, Tag};
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct Payload {
+#[derive(Deserialize)]
+pub(super) struct Payload {
     #[serde(alias = "statuscode")]
     status_code: String,
     #[serde(
@@ -27,6 +27,7 @@ impl Payload {
     }
 }
 
+/// An enum contains all of the data types, corresponding to each `Endpoint`
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Data {
     Authors(Vec<Author>),
@@ -77,6 +78,7 @@ pub mod types {
         pub last_modified: String,
     }
 
+    /// This is not the same as Mod, as the api returns less data for `Endpoint::Mods` compared to `Endpoint::Mod`
     #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct ModsListMod {
         #[serde(alias = "modid")]
@@ -95,7 +97,8 @@ pub mod types {
         pub author: String,
         #[serde(alias = "urlalias")]
         pub url_alias: Option<String>,
-        pub side: Side,
+        pub side: ModSide,
+        pub r#type: ModType,
         pub logo: Option<String>,
         pub tags: Vec<String>,
         #[serde(alias = "lastreleased")]
@@ -132,9 +135,8 @@ pub mod types {
         #[serde(alias = "trendingpoints")]
         pub trending_points: i64,
         pub comments: u64,
-        pub side: Side,
-        #[serde(alias = "type")]
-        pub r#type: String,
+        pub side: ModSide,
+        pub r#type: ModType,
         pub created: String,
         #[serde(alias = "lastreleased")]
         pub last_released: String,
@@ -179,12 +181,22 @@ pub mod types {
     }
 
     #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
-    pub enum Side {
+    pub enum ModSide {
         #[serde(alias = "client")]
         Client,
         #[serde(alias = "server")]
         Server,
         #[serde(alias = "both")]
         Both,
+    }
+
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+    pub enum ModType {
+        #[serde(alias = "mod")]
+        Mod,
+        #[serde(alias = "externaltool")]
+        ExternalTool,
+        #[serde(alias = "other")]
+        Other,
     }
 }

@@ -1,21 +1,29 @@
 pub mod data;
 
-use std::fmt;
-
 use reqwest;
+use std::fmt;
 
 static URL_BASE: &str = "https://mods.vintagestory.at/api/";
 
+/// An enum representing the possile endpoints of the VintageStory Mod Database API.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Endpoint {
+    /// Returns all authors
     Authors,
+    /// Returns a list of all mods, or a limited selection if settings are specified
     Mods(Option<ModSearchSettings>),
+    /// Returns all comments from any asset id (Not mod id) specified. If none is specified, it returns the latest 100 comments
     Comments(Option<u64>),
+    /// Returns all tags
     Tags,
+    /// Returns all game versions
     GameVersions,
+    /// Each mod is requested by its mod id (u64)
+    /// Will result in a `Error::PayloadError("404")` if no mod is found
     Mod(u64),
 }
 
+/// The settings for `Endpoint::Mods`
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModSearchSettings {
     pub text: Option<String>,
@@ -26,13 +34,22 @@ pub struct ModSearchSettings {
     pub order_direction: Option<OrderDirection>,
 }
 
+/// The method to order the results of `Endpoint::Mods`
+/// If none is specified, `OrderBy::Created`
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OrderBy {
+    /// Sort by date created
+    /// This is the default if none is specified
     Created,
+    /// Sort by date 'last updated' (This is what I am assuming, I am not 100% sure)
     LastReleased,
+    /// Sort by downloads
     Downloads,
+    /// Sort by follows
     Follows,
+    /// Sort by comment count
     Comments,
+    /// Sort by trending points
     TrendingPoints,
 }
 
@@ -169,11 +186,13 @@ impl Endpoint {
     }
 }
 
+/// The errors that may occur while requesting an `Endpoint`.
 #[derive(Debug)]
 pub enum Error {
     RequestError(reqwest::Error),
     JsonError(serde_json::Error),
     /// This contains the status code, however it is given as a string in the mod API
+    /// If this is a 404 error and you requested a mod, it is likely because the mod doesn't exist
     /// TODO | Change to reqwest::StatusCode
     PayloadError(String),
 }
