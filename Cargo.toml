@@ -3,6 +3,8 @@ name = "rusty-vs-mod-api"
 version = "0.1.0"
 edition = "2024"
 repository = "https://github.com/SmoothTurtle872/vs-mod-api"
+description = "A simple rust interface for the Vintage Story Mod Database JSON API"
+license = "unlicense"
 
 [dependencies]
 reqwest = "0.13.4"
